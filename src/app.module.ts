@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit, Logger as CommonLogger } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
@@ -7,14 +7,17 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { LoggerModule } from './logger/logger.module';
 import configuration from './config/configuration';
 import DatabaseConfig from './config/databaseconfig';
+import * as cns from 'src/helpers/connection-names';
 
 @Module({
 	imports: [
 		UserModule,
+		LoggerModule,
 		ConfigModule.forRoot({
-			envFilePath: '.dev.env',
+			envFilePath: 'src/.dev.env',
 			isGlobal: true,
 			load: [configuration],
+			cache: true,
 		}),
 		MongooseModule.forRootAsync({
 			imports: [ConfigModule],
@@ -22,10 +25,18 @@ import DatabaseConfig from './config/databaseconfig';
 				uri: configService.get<DatabaseConfig>('db').logger.connection,
 			}),
 			inject: [ConfigService],
+			connectionName: cns.LOG,
 		}),
-		LoggerModule,
 	],
 	controllers: [AppController],
-	providers: [AppService, LoggerModule],
+	providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+	constructor(private configService: ConfigService) {}
+
+	onModuleInit() {
+		const loggerConnection =
+			this.configService.get<DatabaseConfig>('db').logger.connection;
+		CommonLogger.log(`LOGGER CONNECTION: ${loggerConnection}`, 'AppModule');
+	}
+}
