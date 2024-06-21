@@ -1,14 +1,22 @@
 import { Request, Response, NextFunction } from 'express';
 //import { sources, appendJSONFile } from 'src/helpers';
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { LoggerService } from './logger.service';
+import { HttpMethod } from 'src/helpers/types';
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
-	constructor(private configService: ConfigService) {}
+	constructor(private loggerService: LoggerService) {}
 
-	use(req: Request, res: Response, next: NextFunction) {
-		console.log('Request');
+	async use(req: Request, res: Response, next: NextFunction) {
+		await this.loggerService.insertOne({
+			url: req.url,
+			method: req.method as HttpMethod,
+			body: req.body,
+			params: req.params,
+			query: req.query,
+			timeStamp: new Date(),
+		});
 		next();
 	}
 }
