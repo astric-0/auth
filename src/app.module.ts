@@ -8,6 +8,8 @@ import { LoggerModule } from './logger/logger.module';
 import configuration from './config/configuration';
 import DatabaseConfig from './config/databaseconfig';
 import * as cns from 'src/helpers/connection-names';
+import { PassportModule } from '@nestjs/passport';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
 	imports: [
@@ -27,6 +29,8 @@ import * as cns from 'src/helpers/connection-names';
 			inject: [ConfigService],
 			connectionName: cns.LOG,
 		}),
+		PassportModule.register({ defaultStrategy: 'jwt' }),
+		AuthModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
