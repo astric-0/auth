@@ -5,8 +5,12 @@ import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LoggerModule } from './logger/logger.module';
-import configuration from './config/configuration';
-import DatabaseConfig from './config/databaseconfig';
+import {
+	config as configuration,
+	DatabaseConfig,
+	configKeys,
+	configPath,
+} from './config/';
 import * as cns from 'src/helpers/connection-names';
 import { PassportModule } from '@nestjs/passport';
 import { AuthModule } from './auth/auth.module';
@@ -16,7 +20,7 @@ import { AuthModule } from './auth/auth.module';
 		UserModule,
 		LoggerModule,
 		ConfigModule.forRoot({
-			envFilePath: 'src/.dev.env',
+			envFilePath: configPath,
 			isGlobal: true,
 			load: [configuration],
 			cache: true,
@@ -24,7 +28,8 @@ import { AuthModule } from './auth/auth.module';
 		MongooseModule.forRootAsync({
 			imports: [ConfigModule],
 			useFactory: async (configService: ConfigService) => ({
-				uri: configService.get<DatabaseConfig>('db').logger.connection,
+				uri: configService.get<DatabaseConfig>(configKeys.db).logger
+					.connection,
 			}),
 			inject: [ConfigService],
 			connectionName: cns.LOG,
@@ -39,8 +44,9 @@ export class AppModule implements OnModuleInit {
 	constructor(private configService: ConfigService) {}
 
 	onModuleInit() {
-		const loggerConnection =
-			this.configService.get<DatabaseConfig>('db').logger.connection;
+		const loggerConnection = this.configService.get<DatabaseConfig>(
+			configKeys.db,
+		).logger.connection;
 		CommonLogger.log(`LOGGER CONNECTION: ${loggerConnection}`, 'AppModule');
 	}
 }

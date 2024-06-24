@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 import { UserModule } from 'src/user/user.module';
 import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import JwtConfig from 'src/config/jwtconfig';
+import { configKeys, JwtConfig } from 'src/config';
 
 @Module({
 	imports: [
@@ -15,8 +15,8 @@ import JwtConfig from 'src/config/jwtconfig';
 			imports: [ConfigModule],
 			global: true,
 			useFactory: async (configService: ConfigService) => ({
-				secret: configService.get<JwtConfig>('jwt').secret,
-				signOptions: { expiresIn: '60s' },
+				secret: configService.get<JwtConfig>(configKeys.jwt).secret,
+				signOptions: { expiresIn: '3600s' },
 			}),
 			inject: [ConfigService],
 		}),
@@ -30,7 +30,7 @@ export class AuthModule implements OnModuleInit {
 	constructor(private configService: ConfigService) {}
 
 	onModuleInit() {
-		const key = this.configService.get<JwtConfig>('jwt').secret;
+		const key = this.configService.get<JwtConfig>(configKeys.jwt).secret;
 		CommonLogger.log('SECRET KEY: ' + key, 'AUTH MODULE');
 	}
 }
