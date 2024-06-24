@@ -14,10 +14,15 @@ import { configKeys, JwtConfig } from 'src/config';
 		JwtModule.registerAsync({
 			imports: [ConfigModule],
 			global: true,
-			useFactory: async (configService: ConfigService) => ({
-				secret: configService.get<JwtConfig>(configKeys.jwt).secret,
-				signOptions: { expiresIn: '3600s' },
-			}),
+			useFactory: async (configService: ConfigService) => {
+				const { secret, expiresIn } = configService.get<JwtConfig>(
+					configKeys.jwt,
+				);
+				return {
+					secret,
+					signOptions: { expiresIn },
+				};
+			},
 			inject: [ConfigService],
 		}),
 		UserModule,
