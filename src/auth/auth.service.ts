@@ -1,7 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LogInDto } from './dto/log-in-dto';
-import { UserInfoDto } from 'src/user/dto/user-info.dto';
 import { UserInfo } from 'src/user/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
@@ -62,15 +61,13 @@ export class AuthService {
 
 		if (!isMatched)
 			throw new UnauthorizedException('Incorrect user or password');
-		//const dto = instanceToInstance(UserInfoDto, userInfo);
-		const userInfoDto = plainToClass(
-			UserInfoDto,
-			instanceToPlain(userInfo),
-			{ excludeExtraneousValues: true },
-		);
+
+		const userInfoObj = instanceToPlain(userInfo, {
+			excludeExtraneousValues: true,
+		});
 
 		return {
-			access_token: await this.jwtService.signAsync(userInfoDto),
+			access_token: await this.jwtService.signAsync(userInfoObj),
 		};
 	}
 }
