@@ -12,7 +12,7 @@ export class LoggerService {
 		private loggerModel: Model<LogDocument>,
 	) {}
 
-	async insertOne(logDto: CreateLogDto): Promise<Log> {
+	insertOne(logDto: CreateLogDto): Promise<Log> {
 		const createdLog = new this.loggerModel(logDto);
 		return createdLog.save();
 	}

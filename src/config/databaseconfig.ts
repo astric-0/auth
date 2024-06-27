@@ -1,5 +1,6 @@
 interface DatabaseConfig {
 	logger: Db;
+	main: Db;
 }
 
 interface Db {

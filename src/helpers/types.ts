@@ -6,3 +6,10 @@ export type HttpMethod =
 	| 'PACTH'
 	| 'OPTIONS'
 	| 'HEAD';
+
+export type Identity = {
+	AppCode: string;
+	User: {
+		Username: string;
+	};
+};

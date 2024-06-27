@@ -3,10 +3,12 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthService } from './auth.service';
-import { UserModule } from 'src/user/user.module';
 import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configKeys, JwtConfig } from 'src/config';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from 'src/user/user.schema';
+import { USER } from 'src/helpers/connection-names';
 
 @Module({
 	imports: [
@@ -25,7 +27,10 @@ import { configKeys, JwtConfig } from 'src/config';
 			},
 			inject: [ConfigService],
 		}),
-		UserModule,
+		MongooseModule.forFeature(
+			[{ name: User.name, schema: UserSchema }],
+			USER,
+		),
 	],
 	providers: [JwtStrategy, AuthService],
 	exports: [JwtModule, PassportModule],

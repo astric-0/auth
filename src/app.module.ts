@@ -34,6 +34,15 @@ import { AuthModule } from './auth/auth.module';
 			inject: [ConfigService],
 			connectionName: cns.LOG,
 		}),
+		MongooseModule.forRootAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: async (configService: ConfigService) => ({
+				uri: configService.get<DatabaseConfig>(configKeys.db).main
+					.connection,
+			}),
+			connectionName: cns.USER,
+		}),
 		PassportModule.register({ defaultStrategy: 'jwt' }),
 		AuthModule,
 	],
