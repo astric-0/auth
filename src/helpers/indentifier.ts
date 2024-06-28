@@ -10,14 +10,14 @@ export function getIdentity(
 		{},
 	);
 
-	return {
+	return Object.freeze({
 		...data,
 		[AppCode]: appCode ?? data[AppCode],
-		user: {
+		user: Object.freeze({
 			username,
 			appCode,
-		},
-	};
+		}),
+	});
 }
 
 export const AppCode = 'AppCode';

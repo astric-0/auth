@@ -16,9 +16,9 @@ import { Reflector } from '@nestjs/core';
 @Injectable()
 export class AuthGuard implements CanActivate {
 	constructor(
-		private jwtService: JwtService,
-		private configService: ConfigService,
-		private reflector: Reflector,
+		private readonly jwtService: JwtService,
+		private readonly configService: ConfigService,
+		private readonly reflector: Reflector,
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -43,9 +43,7 @@ export class AuthGuard implements CanActivate {
 				secret,
 			});
 
-			request.identity = Object.freeze(
-				getIdentity(request.headers, payload),
-			);
+			request.identity = getIdentity(request.headers, payload);
 		} catch (error) {
 			CommonLogger.log(error.message, 'AUTH GUARD');
 			throw new UnauthorizedException(
