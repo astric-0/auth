@@ -16,8 +16,9 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AppCode } from 'src/helpers/indentifier';
-import { Public } from 'src/public/public.decorator';
+import { Identity, Public } from 'src/public/public.decorator';
 import { UserInfoDto } from './dto/user-info.dto';
+import { Identity as IdentityType } from 'src/helpers/types';
 
 @UseGuards(AuthGuard)
 @Controller('user')
@@ -30,11 +31,31 @@ export class UserController {
 	// 	return users;
 	// }
 
-	@Get(':id')
+	@Get('findOne/:id')
 	async findOne(@Param('id') id: string): Promise<UserInfoDto> {
 		const user: UserInfoDto | null = await this.userService.findOne(+id);
 		if (!user) throw new NotFoundException('User not found');
 		return user;
+	}
+
+	@Get('findOneByUsername/:username')
+	async findOneByUsername(
+		@Param('username') username: string,
+		@Headers(AppCode) appCode: string,
+	): Promise<UserInfoDto> {
+		const user: UserInfoDto | null =
+			await this.userService.findOneByUsername(username, appCode);
+		if (!user) throw new NotFoundException('User not found');
+		return user;
+	}
+
+	@Get('findAll')
+	async findAll(@Identity() identity: IdentityType) {
+		const usersInfoDto: UserInfoDto[] | null =
+			await this.userService.findAll(identity.AppCode);
+		if (!usersInfoDto)
+			throw new NotFoundException("Couldn't find users for the app");
+		return usersInfoDto;
 	}
 
 	@Public()

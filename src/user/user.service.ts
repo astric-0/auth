@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserInfo } from './entities/user.entity';
 import { UserDocument, User as UserModel } from './user.schema';
-import { readFile, sources } from 'src/helpers';
 import { InjectModel } from '@nestjs/mongoose';
 import { USER } from 'src/helpers/connection-names';
 import { Model } from 'mongoose';
@@ -10,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { configKeys } from 'src/config';
 import * as bcrypt from 'bcrypt';
 import { UserInfoDto } from './dto/user-info.dto';
-import { plainToClass } from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UserService {
@@ -36,21 +34,33 @@ export class UserService {
 			.exec();
 
 		if (!userDoc) return null;
-		return plainToClass(UserInfoDto, userDoc);
+		return plainToInstance(UserInfoDto, userDoc, {
+			excludeExtraneousValues: true,
+		});
 	}
 
-	async findAll(): Promise<UserInfo[]> {
-		return await readFile<UserInfo[]>(sources.db);
+	async findAll(appCode: string): Promise<UserInfoDto[] | null> {
+		const userDocs: UserDocument[] | null = await this.userModel
+			.find({ appCode })
+			.lean()
+			.exec();
+
+		if (userDocs?.length == 0) return null;
+		return plainToInstance(UserInfoDto, userDocs, {
+			excludeExtraneousValues: true,
+		});
 	}
 
 	async findOne(id: number): Promise<UserInfoDto | null> {
-		const userDoc = await this.userModel
-			.findOne((user: UserDocument) => user.id == id)
+		const userDoc: UserDocument | null = await this.userModel
+			.findOne({ id })
 			.lean()
 			.exec();
 
 		if (!userDoc) return null;
-		return plainToClass(UserInfoDto, userDoc);
+		return plainToInstance(UserInfoDto, userDoc, {
+			excludeExtraneousValues: true,
+		});
 	}
 
 	async create(
