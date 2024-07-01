@@ -1,22 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { UserDocument, User as UserModel } from './user.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { USER } from 'src/helpers/connection-names';
+import { cns, converter } from 'src/helpers';
 import { Model } from 'mongoose';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, UserInfoDto } from './dto';
 import { ConfigService } from '@nestjs/config';
 import { configKeys } from 'src/config';
 import * as bcrypt from 'bcrypt';
-import { UserInfoDto } from './dto/user-info.dto';
-import { plainToClass, plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UserService {
-	private saltRounds: number;
+	private readonly saltRounds: number;
 	constructor(
-		@InjectModel(UserModel.name, USER)
-		private userModel: Model<UserDocument>,
-		private configService: ConfigService,
+		@InjectModel(UserModel.name, cns.USER)
+		private readonly userModel: Model<UserDocument>,
+		private readonly configService: ConfigService,
 	) {
 		this.saltRounds = this.configService.get<number>(configKeys.saltRounds);
 	}
@@ -34,9 +32,7 @@ export class UserService {
 			.exec();
 
 		if (!userDoc) return null;
-		return plainToInstance(UserInfoDto, userDoc, {
-			excludeExtraneousValues: true,
-		});
+		return converter.toInstanceAndExcludeExtras(userDoc, UserInfoDto);
 	}
 
 	async findAll(appCode: string): Promise<UserInfoDto[] | null> {
@@ -46,9 +42,7 @@ export class UserService {
 			.exec();
 
 		if (userDocs?.length == 0) return null;
-		return plainToInstance(UserInfoDto, userDocs, {
-			excludeExtraneousValues: true,
-		});
+		return converter.toInstanceArrayAndExcludeExtras(userDocs, UserInfoDto);
 	}
 
 	async findOne(id: number): Promise<UserInfoDto | null> {
@@ -58,9 +52,7 @@ export class UserService {
 			.exec();
 
 		if (!userDoc) return null;
-		return plainToInstance(UserInfoDto, userDoc, {
-			excludeExtraneousValues: true,
-		});
+		return converter.toInstanceAndExcludeExtras(userDoc, UserInfoDto);
 	}
 
 	async create(
@@ -78,7 +70,11 @@ export class UserService {
 			username,
 			hashedPassword,
 		});
+
 		const userDoc: UserDocument = await userModel.save();
-		return plainToClass(UserInfoDto, userDoc.toObject());
+		return converter.toInstanceAndExcludeExtras(
+			userDoc.toObject(),
+			UserInfoDto,
+		);
 	}
 }
