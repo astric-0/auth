@@ -9,7 +9,7 @@ export class LoggerMiddleware implements NestMiddleware {
 
 	async use(req: Request, res: Response, next: NextFunction) {
 		await this.loggerService.insertOne({
-			url: req.url,
+			url: req.originalUrl,
 			method: req.method as HttpMethod,
 			body: req.body,
 			params: req.params,
