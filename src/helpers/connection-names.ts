@@ -1,2 +1,2 @@
 export const LOG = 'log';
-export const USER = 'user';
+export const MAIN = 'main';
