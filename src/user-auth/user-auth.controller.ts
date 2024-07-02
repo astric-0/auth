@@ -5,13 +5,13 @@ import {
 	Headers,
 	UnauthorizedException,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { UserAuthService } from './user-auth.service';
 import { LogInDto } from './dto/log-in-dto';
 import { AppCode } from 'src/helpers/indentifier';
 
-@Controller('auth')
-export class AuthController {
-	constructor(private authService: AuthService) {}
+@Controller('user-auth')
+export class UserAuthController {
+	constructor(private userAuthService: UserAuthService) {}
 
 	@Post('login')
 	login(
@@ -21,6 +21,6 @@ export class AuthController {
 		if (!username || !password)
 			throw new UnauthorizedException('Invalid or empty inputs');
 
-		return this.authService.login({ username, password }, appCode);
+		return this.userAuthService.login({ username, password }, appCode);
 	}
 }

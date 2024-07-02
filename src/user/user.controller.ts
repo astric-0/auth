@@ -14,22 +14,16 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { UserAuthGuard } from 'src/user-auth/user-auth.guard';
 import { AppCode } from 'src/helpers/indentifier';
 import { Identity, Public } from 'src/public/public.decorator';
 import { UserInfoDto } from './dto/user-info.dto';
 import { Identity as IdentityType } from 'src/helpers/types';
 
-@UseGuards(AuthGuard)
+@UseGuards(UserAuthGuard)
 @Controller('user')
 export class UserController {
 	constructor(private readonly userService: UserService) {}
-
-	// @Get()
-	// async findAll(): Promise<UserInfo[]> {
-	// 	const users: UserInfo[] = await this.userService.findAll();
-	// 	return users;
-	// }
 
 	@Get('findOne/:id')
 	async findOne(@Param('id') id: string): Promise<UserInfoDto> {

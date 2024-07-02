@@ -14,7 +14,7 @@ import { getIdentity } from 'src/helpers/indentifier';
 import { Reflector } from '@nestjs/core';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class UserAuthGuard implements CanActivate {
 	constructor(
 		private readonly jwtService: JwtService,
 		private readonly configService: ConfigService,

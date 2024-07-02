@@ -10,7 +10,7 @@ import { USER } from 'src/helpers/connection-names';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 
 @Injectable()
-export class AuthService {
+export class UserAuthService {
 	constructor(
 		private readonly jwtService: JwtService,
 		@InjectModel(User.name, USER)

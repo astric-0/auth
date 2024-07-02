@@ -13,7 +13,8 @@ import {
 } from './config/';
 import * as cns from 'src/helpers/connection-names';
 import { PassportModule } from '@nestjs/passport';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './user-auth/user-auth.module';
+import { GlobalExceptionFilterModule } from './global-exception-filter/global-exception-filter.module';
 
 @Module({
 	imports: [
@@ -45,6 +46,7 @@ import { AuthModule } from './auth/auth.module';
 		}),
 		PassportModule.register({ defaultStrategy: 'jwt' }),
 		AuthModule,
+		GlobalExceptionFilterModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

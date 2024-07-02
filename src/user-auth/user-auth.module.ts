@@ -2,8 +2,8 @@ import { Module, OnModuleInit, Logger as CommonLogger } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
+import { UserAuthService } from './user-auth.service';
+import { UserAuthController } from './user-auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configKeys, JwtConfig } from 'src/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -32,15 +32,15 @@ import { USER } from 'src/helpers/connection-names';
 			USER,
 		),
 	],
-	providers: [JwtStrategy, AuthService],
+	providers: [JwtStrategy, UserAuthService],
 	exports: [JwtModule, PassportModule],
-	controllers: [AuthController],
+	controllers: [UserAuthController],
 })
 export class AuthModule implements OnModuleInit {
 	constructor(private configService: ConfigService) {}
 
 	onModuleInit() {
 		const key = this.configService.get<JwtConfig>(configKeys.jwt).secret;
-		CommonLogger.log('SECRET KEY: ' + key, 'AUTH MODULE');
+		CommonLogger.log('USER SECRET KEY: ' + key, 'AUTH MODULE');
 	}
 }
