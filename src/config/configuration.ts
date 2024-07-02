@@ -2,6 +2,7 @@ export default () => ({
 	isPublic: process.env.IS_PUBLIC_KEY,
 	statusCodesToLog: process.env.STATUS_CODES_TO_LOG,
 	saltRounds: process.env.SALT_ROUNDS,
+	appDefaultSaltRounds: process.env.APP_DEFAULT_SALT_ROUNDS,
 	db: {
 		logger: {
 			connection: process.env.LOGGER_DB_CONNECTION,
@@ -22,6 +23,7 @@ export const configKeys = Object.freeze({
 	saltRounds: 'saltRounds',
 	isPublic: 'isPublic',
 	statusCodesToLog: 'statusCodesToLog',
+	appDefaultSaltRounds: 'appDefaultSaltRounds',
 });
 
 export const configPath = 'src/.dev.env';
