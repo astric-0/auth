@@ -8,7 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configKeys, JwtConfig } from 'src/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/user/user.schema';
-import { USER } from 'src/helpers/connection-names';
+import { MAIN } from 'src/helpers/connection-names';
 
 @Module({
 	imports: [
@@ -29,7 +29,7 @@ import { USER } from 'src/helpers/connection-names';
 		}),
 		MongooseModule.forFeature(
 			[{ name: User.name, schema: UserSchema }],
-			USER,
+			MAIN,
 		),
 	],
 	providers: [JwtStrategy, UserAuthService],

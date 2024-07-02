@@ -12,7 +12,7 @@ import * as bcrypt from 'bcrypt';
 export class UserService {
 	private readonly saltRounds: number;
 	constructor(
-		@InjectModel(UserModel.name, cns.USER)
+		@InjectModel(UserModel.name, cns.MAIN)
 		private readonly userModel: Model<UserDocument>,
 		private readonly configService: ConfigService,
 	) {
