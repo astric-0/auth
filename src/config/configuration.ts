@@ -1,7 +1,7 @@
 export default () => ({
 	isPublic: process.env.IS_PUBLIC_KEY,
 	statusCodesToLog: process.env.STATUS_CODES_TO_LOG,
-	saltRounds: process.env.SALT_ROUNDS,
+	userDefaultSaltRounds: process.env.USER_DEFAULT_SALT_ROUNDS,
 	appDefaultSaltRounds: process.env.APP_DEFAULT_SALT_ROUNDS,
 	db: {
 		logger: {
@@ -20,7 +20,7 @@ export default () => ({
 export const configKeys = Object.freeze({
 	jwt: 'jwt',
 	db: 'db',
-	saltRounds: 'saltRounds',
+	userDefaultSaltRounds: 'userDefaultSaltRounds',
 	isPublic: 'isPublic',
 	statusCodesToLog: 'statusCodesToLog',
 	appDefaultSaltRounds: 'appDefaultSaltRounds',

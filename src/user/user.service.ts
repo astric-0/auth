@@ -10,13 +10,15 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-	private readonly saltRounds: number;
+	private readonly userDefaultSaltRounds: number;
 	constructor(
 		@InjectModel(UserModel.name, cns.MAIN)
 		private readonly userModel: Model<UserDocument>,
 		private readonly configService: ConfigService,
 	) {
-		this.saltRounds = this.configService.get<number>(configKeys.saltRounds);
+		this.userDefaultSaltRounds = Number(
+			this.configService.get<number>(configKeys.userDefaultSaltRounds),
+		);
 	}
 
 	async findOneByUsername(
@@ -63,7 +65,7 @@ export class UserService {
 
 		if (exists) return null;
 
-		const salt = await bcrypt.genSalt(Number(this.saltRounds));
+		const salt = await bcrypt.genSalt(this.userDefaultSaltRounds);
 		const hashedPassword = await bcrypt.hash(password, salt);
 		const userModel = new this.userModel({
 			appCode,
