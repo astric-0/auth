@@ -3,15 +3,16 @@ import {
 	ExecutionContext,
 	Injectable,
 	UnauthorizedException,
-	Logger as CommonLogger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import JwtConfig from 'src/config/jwtconfig';
 import { Request } from 'express';
 import { configKeys } from 'src/config';
-import { getIdentity } from 'src/helpers/indentifier';
+import { AppCode, getUserIdentity } from 'src/helpers/indentifier';
 import { Reflector } from '@nestjs/core';
+import { AppAuthService } from 'src/app-auth/app-auth.service';
+import { USER_IDENTITY } from 'src/helpers/keys';
 
 @Injectable()
 export class UserAuthGuard implements CanActivate {
@@ -19,33 +20,43 @@ export class UserAuthGuard implements CanActivate {
 		private readonly jwtService: JwtService,
 		private readonly configService: ConfigService,
 		private readonly reflector: Reflector,
+		private readonly appAuthService: AppAuthService,
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const request = context.switchToHttp().getRequest();
-		const token = this.extractTokenFromHeader(request);
-
 		const isPublic = this.reflector.getAllAndOverride<boolean>(
 			configKeys.isPublic,
 			[context.getHandler(), context.getClass()],
 		);
-
 		if (isPublic) return true;
 
+		const request: Request = context.switchToHttp().getRequest();
+		const token = this.extractTokenFromHeader(request);
+		const appCodeValue = request.headers[AppCode];
+		const appCode: string = Array.isArray(appCodeValue)
+			? appCodeValue[0]
+			: appCodeValue;
+
 		if (!token) throw new UnauthorizedException('Token not found');
+		if (!appCode)
+			throw new UnauthorizedException("Couldn't recognize the app");
 
 		try {
-			const { secret } = this.configService.get<JwtConfig>(
+			const { userDefaultSecret } = this.configService.get<JwtConfig>(
 				configKeys.jwt,
 			);
+
+			const { userSecret: secret = userDefaultSecret } =
+				await this.appAuthService.findOneByAppCodeOrAppName({
+					appCode,
+				});
 
 			const payload = await this.jwtService.verifyAsync(token, {
 				secret,
 			});
 
-			request.identity = getIdentity(request.headers, payload);
+			request[USER_IDENTITY] = getUserIdentity(request.headers, payload);
 		} catch (error) {
-			CommonLogger.log(error.message, 'AUTH GUARD');
 			throw new UnauthorizedException(
 				"Couldn't Authenticate: " + error.message,
 			);

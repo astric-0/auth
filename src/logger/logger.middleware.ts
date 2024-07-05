@@ -17,7 +17,7 @@ export class LoggerMiddleware implements NestMiddleware {
 			timeStamp: new Date(),
 		});
 
-		req[keys.LogRecordId] = logDoc.id;
+		req[keys.LOG_RECORD_ID] = logDoc.id;
 		next();
 	}
 }

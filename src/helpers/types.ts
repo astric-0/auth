@@ -7,9 +7,20 @@ export type HttpMethod =
 	| 'OPTIONS'
 	| 'HEAD';
 
-export type Identity = {
+export interface UserIdentity {
 	AppCode: string;
 	User: {
 		Username: string;
 	};
-};
+}
+
+export interface AppIdentity {
+	AppName: string;
+	AppCode: string;
+	appSecretHashed: string;
+	saltRoundsForUsers: number;
+	saltRoundsForApp: number;
+	userSecret: string;
+	userExpireTime: string;
+	createdOn: Date;
+}

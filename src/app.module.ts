@@ -13,9 +13,8 @@ import {
 } from './config/';
 import * as cns from 'src/helpers/connection-names';
 import { PassportModule } from '@nestjs/passport';
-import { AuthModule } from './user-auth/user-auth.module';
+import { UserAuthModule } from './user-auth/user-auth.module';
 import { GlobalExceptionFilterModule } from './global-exception-filter/global-exception-filter.module';
-import { AppAuthService } from './app-auth/app-auth.service';
 import { AppAuthModule } from './app-auth/app-auth.module';
 
 @Module({
@@ -47,12 +46,12 @@ import { AppAuthModule } from './app-auth/app-auth.module';
 			connectionName: cns.MAIN,
 		}),
 		PassportModule.register({ defaultStrategy: 'jwt' }),
-		AuthModule,
-		GlobalExceptionFilterModule,
+		UserAuthModule,
 		AppAuthModule,
+		GlobalExceptionFilterModule,
 	],
 	controllers: [AppController],
-	providers: [AppService, AppAuthService],
+	providers: [AppService],
 })
 export class AppModule implements OnModuleInit {
 	constructor(private configService: ConfigService) {}

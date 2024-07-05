@@ -3,14 +3,16 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.schema';
-import { USER } from 'src/helpers/connection-names';
+import { MAIN } from 'src/helpers/connection-names';
+import { AppAuthModule } from 'src/app-auth/app-auth.module';
 
 @Module({
 	imports: [
 		MongooseModule.forFeature(
 			[{ name: User.name, schema: UserSchema }],
-			USER,
+			MAIN,
 		),
+		AppAuthModule,
 	],
 	controllers: [UserController],
 	providers: [UserService],

@@ -1,6 +1,6 @@
 export default () => ({
 	isPublic: process.env.IS_PUBLIC_KEY,
-	statusCodesToLog: process.env.STATUS_CODES_TO_LOG,
+	errorStatusCodesToLog: process.env.ERROR_STATUS_CODES_TO_LOG,
 	userDefaultSaltRounds: process.env.USER_DEFAULT_SALT_ROUNDS,
 	appDefaultSaltRounds: process.env.APP_DEFAULT_SALT_ROUNDS,
 	db: {
@@ -12,8 +12,10 @@ export default () => ({
 		},
 	},
 	jwt: {
-		secret: process.env.JWT_SECRET,
-		expiresIn: process.env.JWT_EXPIRE_TIME,
+		appDefaultSecret: process.env.APP_DEFAULT_JWT_SECRET,
+		appDefaultexpiresIn: process.env.APP_DEFAULT_JWT_EXPIRE_TIME,
+		userDefaultSecret: process.env.USER_DEFAULT_JWT_SECRET,
+		userDefaultexpiresIn: process.env.USER_DEFAULT_JWT_EXPIRE_TIME,
 	},
 });
 
@@ -22,7 +24,7 @@ export const configKeys = Object.freeze({
 	db: 'db',
 	userDefaultSaltRounds: 'userDefaultSaltRounds',
 	isPublic: 'isPublic',
-	statusCodesToLog: 'statusCodesToLog',
+	errorStatusCodesToLog: 'errorStatusCodesToLog',
 	appDefaultSaltRounds: 'appDefaultSaltRounds',
 });
 

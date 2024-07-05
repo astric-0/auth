@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { App, AppSchema } from './app.schema';
+import { cns } from 'src/helpers';
+import { AppAuthService } from './app-auth.service';
+import { AppAuthController } from './app-auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './jwt.strategy';
-import { UserAuthService } from './user-auth.service';
-import { UserAuthController } from './user-auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { configKeys, JwtConfig } from 'src/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from 'src/user/user.schema';
-import { MAIN } from 'src/helpers/connection-names';
-import { AppAuthModule } from 'src/app-auth/app-auth.module';
+import { JwtConfig, configKeys } from 'src/config';
 
 @Module({
 	imports: [
@@ -31,13 +29,12 @@ import { AppAuthModule } from 'src/app-auth/app-auth.module';
 			inject: [ConfigService],
 		}),
 		MongooseModule.forFeature(
-			[{ name: User.name, schema: UserSchema }],
-			MAIN,
+			[{ name: App.name, schema: AppSchema }],
+			cns.MAIN,
 		),
-		AppAuthModule,
 	],
-	providers: [JwtStrategy, UserAuthService],
-	exports: [JwtModule, PassportModule],
-	controllers: [UserAuthController],
+	providers: [AppAuthService],
+	controllers: [AppAuthController],
+	exports: [AppAuthService],
 })
-export class UserAuthModule {}
+export class AppAuthModule {}

@@ -1,15 +1,19 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Transform } from 'class-transformer';
-import { HydratedDocument, ObjectId } from 'mongoose';
+import { HydratedDocument, ObjectId, Schema as SchemaType } from 'mongoose';
+import { Transform, Type } from 'class-transformer';
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema()
 export class User {
-	@Transform((params) => params.obj._id)
+	@Transform((params) => params.obj._id.toString())
+	@Type(() => String)
 	_id: ObjectId;
 
-	@Prop({ required: true, type: String })
+	@Prop({ type: SchemaType.Types.ObjectId, ref: 'app' })
+	appId: ObjectId;
+
+	@Prop({ type: String, ref: 'app' })
 	appCode: string;
 
 	@Prop({ required: true, type: String })

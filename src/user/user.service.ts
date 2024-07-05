@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	ConflictException,
+	Injectable,
+} from '@nestjs/common';
 import { UserDocument, User as UserModel } from './user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { cns, converter } from 'src/helpers';
@@ -7,6 +11,8 @@ import { CreateUserDto, UserInfoDto } from './dto';
 import { ConfigService } from '@nestjs/config';
 import { configKeys } from 'src/config';
 import * as bcrypt from 'bcrypt';
+import { AppAuthService } from 'src/app-auth/app-auth.service';
+import { AppInfoDto } from 'src/app-auth/dto/app-info.dto';
 
 @Injectable()
 export class UserService {
@@ -15,6 +21,7 @@ export class UserService {
 		@InjectModel(UserModel.name, cns.MAIN)
 		private readonly userModel: Model<UserDocument>,
 		private readonly configService: ConfigService,
+		private readonly appAuthService: AppAuthService,
 	) {
 		this.userDefaultSaltRounds = Number(
 			this.configService.get<number>(configKeys.userDefaultSaltRounds),
@@ -30,11 +37,13 @@ export class UserService {
 				username: { $regex: new RegExp(`^${username}`, 'i') },
 				appCode,
 			})
-			.lean()
 			.exec();
 
 		if (!userDoc) return null;
-		return converter.toInstanceAndExcludeExtras(userDoc, UserInfoDto);
+		return converter.toInstanceAndExcludeExtras(
+			userDoc.toObject(),
+			UserInfoDto,
+		);
 	}
 
 	async findAll(appCode: string): Promise<UserInfoDto[] | null> {
@@ -47,9 +56,9 @@ export class UserService {
 		return converter.toInstanceArrayAndExcludeExtras(userDocs, UserInfoDto);
 	}
 
-	async findOne(id: number): Promise<UserInfoDto | null> {
+	async findOne(id: string, appCode: string): Promise<UserInfoDto | null> {
 		const userDoc: UserDocument | null = await this.userModel
-			.findOne({ id })
+			.findOne({ id, appCode })
 			.lean()
 			.exec();
 
@@ -57,18 +66,31 @@ export class UserService {
 		return converter.toInstanceAndExcludeExtras(userDoc, UserInfoDto);
 	}
 
-	async create(
-		{ username, password }: CreateUserDto,
-		appCode: string,
-	): Promise<UserInfoDto | null> {
-		const exists = await this.findOneByUsername(username, appCode);
+	async create({
+		username,
+		password,
+		appCode,
+	}: CreateUserDto): Promise<UserInfoDto> {
+		const appInfoDto: AppInfoDto =
+			await this.appAuthService.findOneByAppCodeOrAppName({
+				appCode,
+				appName: null,
+			});
 
-		if (exists) return null;
+		if (!appInfoDto) throw new BadRequestException("App doesn't exist");
+
+		const userInfoDto: UserInfoDto = await this.findOneByUsername(
+			username,
+			appCode,
+		);
+
+		if (userInfoDto) throw new ConflictException('Username already exists');
 
 		const salt = await bcrypt.genSalt(this.userDefaultSaltRounds);
 		const hashedPassword = await bcrypt.hash(password, salt);
 		const userModel = new this.userModel({
 			appCode,
+			appId: appInfoDto._id,
 			username,
 			hashedPassword,
 		});

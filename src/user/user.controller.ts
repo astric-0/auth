@@ -8,7 +8,6 @@ import {
 	BadRequestException,
 	HttpCode,
 	HttpStatus,
-	InternalServerErrorException,
 	UseGuards,
 	Headers,
 } from '@nestjs/common';
@@ -18,7 +17,8 @@ import { UserAuthGuard } from 'src/user-auth/user-auth.guard';
 import { AppCode } from 'src/helpers/indentifier';
 import { Identity, Public } from 'src/public/public.decorator';
 import { UserInfoDto } from './dto/user-info.dto';
-import { Identity as IdentityType } from 'src/helpers/types';
+import { UserIdentity } from 'src/helpers/types';
+import { USER_IDENTITY } from 'src/helpers/keys';
 
 @UseGuards(UserAuthGuard)
 @Controller('user')
@@ -26,8 +26,16 @@ export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Get('findOne/:id')
-	async findOne(@Param('id') id: string): Promise<UserInfoDto> {
-		const user: UserInfoDto | null = await this.userService.findOne(+id);
+	async findOne(
+		@Param('id') id: string,
+		@Headers(AppCode) appCode: string,
+	): Promise<UserInfoDto> {
+		if (!id) throw new BadRequestException('Please provide user id');
+		const user: UserInfoDto | null = await this.userService.findOne(
+			id,
+			appCode,
+		);
+
 		if (!user) throw new NotFoundException('User not found');
 		return user;
 	}
@@ -37,16 +45,21 @@ export class UserController {
 		@Param('username') username: string,
 		@Headers(AppCode) appCode: string,
 	): Promise<UserInfoDto> {
+		if (!username) throw new BadRequestException('Please provide username');
+
 		const user: UserInfoDto | null =
 			await this.userService.findOneByUsername(username, appCode);
+
 		if (!user) throw new NotFoundException('User not found');
 		return user;
 	}
 
 	@Get('findAll')
-	async findAll(@Identity() identity: IdentityType) {
+	async findAll(
+		@Identity({ type: USER_IDENTITY }) userIdentity: UserIdentity,
+	) {
 		const usersInfoDto: UserInfoDto[] | null =
-			await this.userService.findAll(identity.AppCode);
+			await this.userService.findAll(userIdentity.AppCode);
 		if (!usersInfoDto)
 			throw new NotFoundException("Couldn't find users for the app");
 		return usersInfoDto;
@@ -59,16 +72,15 @@ export class UserController {
 		@Body() user: CreateUserDto,
 		@Headers(AppCode) appCode: string,
 	): Promise<unknown> {
-		if (!user.username || !user.password)
-			throw new BadRequestException('data is incomplete');
-		let userData: UserInfoDto;
-		try {
-			userData = await this.userService.create(user, appCode);
-		} catch (error) {
-			throw new InternalServerErrorException(error.message);
-		}
+		user.appCode ??= appCode;
 
-		if (!userData) throw new BadRequestException('User already exists');
-		return { user: userData, message: 'Account registered' };
+		if (!user.username || !user.password)
+			throw new BadRequestException('Data is incomplete');
+		if (!user.appCode)
+			throw new BadRequestException('AppCode is not defined');
+
+		const userInfoDto: UserInfoDto = await this.userService.create(user);
+
+		return { user: userInfoDto, message: 'Account registered' };
 	}
 }

@@ -19,7 +19,7 @@ export class GlobalExceptionFilter extends BaseExceptionFilter {
 	) {
 		super();
 		this.statusCodesToLog = this.configService
-			.get<string>(configKeys.statusCodesToLog)
+			.get<string>(configKeys.errorStatusCodesToLog)
 			.split(',');
 	}
 
@@ -32,7 +32,7 @@ export class GlobalExceptionFilter extends BaseExceptionFilter {
 
 		if (this.statusCodesToLog.includes(String(statusCode))) {
 			const requestLogId: string = host.switchToHttp().getRequest()[
-				keys.LogRecordId
+				keys.LOG_RECORD_ID
 			];
 			await this.exceptionLogService.insertOne(
 				requestLogId,

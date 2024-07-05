@@ -1,11 +1,17 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
+
 export class UserInfoDto {
 	@Expose()
+	@Transform((params) => params.obj._id.toString())
 	_id: string;
 
 	@Expose()
-	username: string;
+	@Transform((params) => params.obj.appId.toString())
+	appId: string;
 
 	@Expose()
 	appCode: string;
+
+	@Expose()
+	username: string;
 }

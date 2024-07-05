@@ -8,6 +8,8 @@ import { User, UserDocument } from 'src/user/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { MAIN } from 'src/helpers/connection-names';
 import { instanceToPlain, plainToClass } from 'class-transformer';
+import { AppAuthService } from 'src/app-auth/app-auth.service';
+import { AppInfoDto } from 'src/app-auth/dto/app-info.dto';
 
 @Injectable()
 export class UserAuthService {
@@ -15,6 +17,7 @@ export class UserAuthService {
 		private readonly jwtService: JwtService,
 		@InjectModel(User.name, MAIN)
 		private readonly userModel: Model<UserDocument>,
+		private readonly appAuthService: AppAuthService,
 	) {}
 
 	private async findUserEntityByUserName(
@@ -66,8 +69,15 @@ export class UserAuthService {
 			excludeExtraneousValues: true,
 		});
 
+		const { userSecret: secret }: AppInfoDto =
+			await this.appAuthService.findOneByAppCodeOrAppName({
+				appCode,
+			});
+
 		return {
-			access_token: await this.jwtService.signAsync(userInfoObj),
+			access_token: await this.jwtService.signAsync(userInfoObj, {
+				secret,
+			}),
 		};
 	}
 }
