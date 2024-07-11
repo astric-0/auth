@@ -27,7 +27,7 @@ export class App {
 	userSecret: string;
 
 	@Prop({ type: String, required: true })
-	userExpireTime: string;
+	userTokenExpireTime: string;
 }
 
 export const AppSchema = SchemaFactory.createForClass(App);

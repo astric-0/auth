@@ -1,7 +1,7 @@
 import { Exclude, Expose } from 'class-transformer';
 import { IsNotEmpty, IsOptional } from 'class-validator';
 
-export class CreateAppDto {
+export default class CreateAppDto {
 	@Expose()
 	@IsNotEmpty()
 	appCode: string;

@@ -3,24 +3,31 @@ export type HttpMethod =
 	| 'POST'
 	| 'PUT'
 	| 'DELETE'
-	| 'PACTH'
+	| 'PATCH'
 	| 'OPTIONS'
 	| 'HEAD';
 
 export interface UserIdentity {
-	AppCode: string;
-	User: {
-		Username: string;
+	appCode: string;
+	user: {
+		username: string;
+		role: UserRole;
 	};
 }
 
 export interface AppIdentity {
-	AppName: string;
-	AppCode: string;
+	appName: string;
+	appCode: string;
 	appSecretHashed: string;
 	saltRoundsForUsers: number;
 	saltRoundsForApp: number;
 	userSecret: string;
-	userExpireTime: string;
+	userTokenExpireTime: string;
 	createdOn: Date;
+}
+
+export enum UserRole {
+	SuperAdmin = 'super-admin',
+	Admin = 'admin',
+	Client = 'client',
 }

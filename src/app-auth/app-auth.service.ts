@@ -5,8 +5,7 @@ import { cns, converter } from 'src/helpers';
 import { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import { configKeys } from 'src/config';
-import { CreateAppDto } from './dto/create-app.dto';
-import { AppInfoDto } from './dto/app-info.dto';
+import { CreateAppDto, AppInfoDto } from './dto/';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()

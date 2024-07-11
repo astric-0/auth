@@ -23,7 +23,6 @@ export const configKeys = Object.freeze({
 	jwt: 'jwt',
 	db: 'db',
 	userDefaultSaltRounds: 'userDefaultSaltRounds',
-	isPublic: 'isPublic',
 	errorStatusCodesToLog: 'errorStatusCodesToLog',
 	appDefaultSaltRounds: 'appDefaultSaltRounds',
 });

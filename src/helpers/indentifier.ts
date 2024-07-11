@@ -3,22 +3,23 @@ import { UserIdentity } from './types';
 
 export function getUserIdentity(
 	headers: unknown,
-	{ username, appCode }: User,
+	{ username, appCode, role }: User,
 ): UserIdentity {
-	const data = ApplicableHeaders.reduce(
-		(acc, curr) => (acc[curr] = headers[curr]),
-		{},
-	);
+	const data = ApplicableHeaders.reduce((acc, curr) => {
+		acc[curr] = headers[curr];
+		return acc;
+	}, {});
 
 	return Object.freeze({
 		...data,
-		[AppCode]: appCode ?? data[AppCode],
+		appCode: appCode ?? data[AppCode],
 		user: Object.freeze({
 			username,
 			appCode,
+			role,
 		}),
 	});
 }
 
-export const AppCode = 'AppCode';
+export const AppCode = 'appcode';
 export const ApplicableHeaders: string[] = [AppCode] as const;

@@ -1,4 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
+import { UserRole } from 'src/helpers/types';
 
 export class UserInfo {
 	@Expose()
@@ -9,4 +10,7 @@ export class UserInfo {
 
 	@Exclude({ toPlainOnly: true })
 	hashedPassword: string;
+
+	@Expose()
+	role: UserRole;
 }

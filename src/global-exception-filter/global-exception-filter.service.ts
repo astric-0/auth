@@ -3,8 +3,7 @@ import { ExceptionLog, ExceptionLogDocument } from './exception-log.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { cns, converter } from 'src/helpers';
-import { ExceptionLogDto } from './dto/exception-log-dto/exception-log-dto';
-import { CreateExceptionLog } from './dto/create-exception-log/create-exception-log';
+import { ExceptionLogDto, CreateExceptionLog } from './dto/';
 
 @Injectable()
 export class GlobalExceptionFilterService {

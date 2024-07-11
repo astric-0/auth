@@ -1,15 +1,11 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, ObjectId, Schema as SchemaType } from 'mongoose';
-import { Transform, Type } from 'class-transformer';
+import { UserRole } from 'src/helpers/types';
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema()
 export class User {
-	@Transform((params) => params.obj._id.toString())
-	@Type(() => String)
-	_id: ObjectId;
-
 	@Prop({ type: SchemaType.Types.ObjectId, ref: 'app' })
 	appId: ObjectId;
 
@@ -21,6 +17,9 @@ export class User {
 
 	@Prop({ type: String })
 	hashedPassword: string;
+
+	@Prop({ type: String, enum: UserRole, required: true })
+	role: UserRole;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

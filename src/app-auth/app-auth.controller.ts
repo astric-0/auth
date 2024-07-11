@@ -1,9 +1,19 @@
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import {
+	Controller,
+	Post,
+	Body,
+	BadRequestException,
+	UseGuards,
+} from '@nestjs/common';
 import { AppAuthService } from './app-auth.service';
-import { CreateAppDto } from './dto/create-app.dto';
-import { AppInfoDto } from './dto/app-info.dto';
+import { CreateAppDto, AppInfoDto } from './dto/';
+import { UserAuthGuard } from 'src/user-auth/user-auth.guard';
+import { guards, reflectors } from 'src/public/';
+import { UserRole } from 'src/helpers/types';
 
 @Controller('app-auth')
+@UseGuards(UserAuthGuard, guards.RolesGuard)
+@reflectors.Roles([UserRole.SuperAdmin])
 export class AppAuthController {
 	constructor(private readonly appAuthService: AppAuthService) {}
 

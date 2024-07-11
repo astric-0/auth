@@ -13,7 +13,7 @@ import { AppCode, getUserIdentity } from 'src/helpers/indentifier';
 import { Reflector } from '@nestjs/core';
 import { AppAuthService } from 'src/app-auth/app-auth.service';
 import { USER_IDENTITY } from 'src/helpers/keys';
-
+import { Public } from 'src/public/public.reflectors';
 @Injectable()
 export class UserAuthGuard implements CanActivate {
 	constructor(
@@ -24,10 +24,11 @@ export class UserAuthGuard implements CanActivate {
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const isPublic = this.reflector.getAllAndOverride<boolean>(
-			configKeys.isPublic,
-			[context.getHandler(), context.getClass()],
-		);
+		const isPublic = this.reflector.getAllAndOverride<boolean>(Public, [
+			context.getHandler(),
+			context.getClass(),
+		]);
+
 		if (isPublic) return true;
 
 		const request: Request = context.switchToHttp().getRequest();

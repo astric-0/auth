@@ -1,4 +1,4 @@
-export class CreateExceptionLog {
+export default class CreateExceptionLog {
 	requestLog: unknown;
 	cause: unknown;
 	timeStamp: Date;

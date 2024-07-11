@@ -9,7 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { MAIN } from 'src/helpers/connection-names';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 import { AppAuthService } from 'src/app-auth/app-auth.service';
-import { AppInfoDto } from 'src/app-auth/dto/app-info.dto';
+import { AppInfoDto } from 'src/app-auth/dto/';
 
 @Injectable()
 export class UserAuthService {

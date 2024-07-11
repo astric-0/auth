@@ -12,13 +12,10 @@ import {
 	Headers,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, UserInfoDto } from './dto/';
 import { UserAuthGuard } from 'src/user-auth/user-auth.guard';
-import { AppCode } from 'src/helpers/indentifier';
-import { Identity, Public } from 'src/public/public.decorator';
-import { UserInfoDto } from './dto/user-info.dto';
-import { UserIdentity } from 'src/helpers/types';
-import { USER_IDENTITY } from 'src/helpers/keys';
+import { reflectors, decorators } from 'src/public/';
+import { types, keys, identifier } from 'src/helpers/';
 
 @UseGuards(UserAuthGuard)
 @Controller('user')
@@ -28,7 +25,7 @@ export class UserController {
 	@Get('findOne/:id')
 	async findOne(
 		@Param('id') id: string,
-		@Headers(AppCode) appCode: string,
+		@Headers(identifier.AppCode) appCode: string,
 	): Promise<UserInfoDto> {
 		if (!id) throw new BadRequestException('Please provide user id');
 		const user: UserInfoDto | null = await this.userService.findOne(
@@ -43,7 +40,7 @@ export class UserController {
 	@Get('findOneByUsername/:username')
 	async findOneByUsername(
 		@Param('username') username: string,
-		@Headers(AppCode) appCode: string,
+		@Headers(identifier.AppCode) appCode: string,
 	): Promise<UserInfoDto> {
 		if (!username) throw new BadRequestException('Please provide username');
 
@@ -56,21 +53,22 @@ export class UserController {
 
 	@Get('findAll')
 	async findAll(
-		@Identity({ type: USER_IDENTITY }) userIdentity: UserIdentity,
+		@decorators.Identity({ type: keys.USER_IDENTITY })
+		userIdentity: types.UserIdentity,
 	) {
 		const usersInfoDto: UserInfoDto[] | null =
-			await this.userService.findAll(userIdentity.AppCode);
+			await this.userService.findAll(userIdentity.appCode);
 		if (!usersInfoDto)
 			throw new NotFoundException("Couldn't find users for the app");
 		return usersInfoDto;
 	}
 
-	@Public()
+	@reflectors.Public(true)
 	@Post('create')
 	@HttpCode(HttpStatus.CREATED)
 	async create(
 		@Body() user: CreateUserDto,
-		@Headers(AppCode) appCode: string,
+		@Headers(identifier.AppCode) appCode: string,
 	): Promise<unknown> {
 		user.appCode ??= appCode;
 

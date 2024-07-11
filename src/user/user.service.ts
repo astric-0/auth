@@ -12,7 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { configKeys } from 'src/config';
 import * as bcrypt from 'bcrypt';
 import { AppAuthService } from 'src/app-auth/app-auth.service';
-import { AppInfoDto } from 'src/app-auth/dto/app-info.dto';
+import { AppInfoDto } from 'src/app-auth/dto/';
 
 @Injectable()
 export class UserService {

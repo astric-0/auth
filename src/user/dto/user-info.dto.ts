@@ -1,6 +1,8 @@
+import { PartialType } from '@nestjs/mapped-types';
 import { Expose, Transform } from 'class-transformer';
+import CreateUserDto from './create-user.dto';
 
-export class UserInfoDto {
+export default class UserInfoDto extends PartialType(CreateUserDto) {
 	@Expose()
 	@Transform((params) => params.obj._id.toString())
 	_id: string;
@@ -8,10 +10,4 @@ export class UserInfoDto {
 	@Expose()
 	@Transform((params) => params.obj.appId.toString())
 	appId: string;
-
-	@Expose()
-	appCode: string;
-
-	@Expose()
-	username: string;
 }
