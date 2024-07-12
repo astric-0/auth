@@ -42,16 +42,16 @@ export class UserAuthGuard implements CanActivate {
 		if (!appCode)
 			throw new UnauthorizedException("Couldn't recognize the app");
 
+		const { userDefaultSecret } = this.configService.get<JwtConfig>(
+			configKeys.jwt,
+		);
+
+		const { userSecret: secret = userDefaultSecret } =
+			await this.appAuthService.findOneByAppCodeOrAppName({
+				appCode,
+			});
+
 		try {
-			const { userDefaultSecret } = this.configService.get<JwtConfig>(
-				configKeys.jwt,
-			);
-
-			const { userSecret: secret = userDefaultSecret } =
-				await this.appAuthService.findOneByAppCodeOrAppName({
-					appCode,
-				});
-
 			const payload = await this.jwtService.verifyAsync(token, {
 				secret,
 			});
