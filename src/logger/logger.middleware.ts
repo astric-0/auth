@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { LoggerService } from './logger.service';
-import { types, keys } from 'src/helpers';
+import { types, keys, identifier } from 'src/helpers';
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
@@ -15,6 +15,9 @@ export class LoggerMiddleware implements NestMiddleware {
 			params: req.params,
 			query: req.query,
 			timeStamp: new Date(),
+			headers: identifier.ApplicableHeaders.map((key) => ({
+				[key]: req.headers[key],
+			})),
 		});
 
 		req[keys.LOG_RECORD_ID] = logDoc.id;

@@ -8,4 +8,5 @@ export class CreateLogDto {
 	body: any;
 	params: ParamsDictionary;
 	query: Query;
+	headers: unknown[];
 }

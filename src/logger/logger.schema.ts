@@ -28,6 +28,9 @@ export class Log {
 
 	@Prop({ type: Object })
 	query: any;
+
+	@Prop({ type: [Object] })
+	headers: unknown[];
 }
 
 export const LogSchema = SchemaFactory.createForClass(Log);
