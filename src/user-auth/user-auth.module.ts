@@ -20,7 +20,7 @@ import { AppAuthModule } from 'src/app-auth/app-auth.module';
 			useFactory: async (configService: ConfigService) => {
 				const {
 					userDefaultSecret: secret,
-					userDefaultexpiresIn: expiresIn,
+					userDefaultExpiresIn: expiresIn,
 				} = configService.get<JwtConfig>(configKeys.jwt);
 
 				return {

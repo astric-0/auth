@@ -22,4 +22,6 @@ export function getUserIdentity(
 }
 
 export const AppCode = 'appcode';
-export const ApplicableHeaders: string[] = [AppCode] as const;
+export const AuthType = 'authtype';
+
+export const ApplicableHeaders: string[] = [AppCode, AuthType] as const;

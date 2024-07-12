@@ -1,6 +1,6 @@
 export default interface JwtConfig {
 	appDefaultSecret: string;
-	appDefaultexpiresIn: string;
+	appDefaultExpiresIn: string;
 	userDefaultSecret: string;
-	userDefaultexpiresIn: string;
+	userDefaultExpiresIn: string;
 }

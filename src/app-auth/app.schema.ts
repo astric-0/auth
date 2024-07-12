@@ -12,7 +12,10 @@ export class App {
 	appName: string;
 
 	@Prop({ type: String, required: true })
-	appSecretHashed: string;
+	appSecret: string;
+
+	@Prop({ type: String, required: true })
+	appPasswordHashed: string;
 
 	@Prop({ type: Number })
 	saltRoundsForUsers: number;
@@ -28,6 +31,9 @@ export class App {
 
 	@Prop({ type: String, required: true })
 	userTokenExpireTime: string;
+
+	@Prop({ type: String, required: true })
+	appTokenExpireTime: string;
 }
 
 export const AppSchema = SchemaFactory.createForClass(App);

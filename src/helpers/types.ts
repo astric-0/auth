@@ -29,5 +29,9 @@ export interface AppIdentity {
 export enum UserRole {
 	SuperAdmin = 'super-admin',
 	Admin = 'admin',
-	Client = 'client',
+}
+
+export enum AuthType {
+	Admin = 'admin',
+	App = 'app',
 }

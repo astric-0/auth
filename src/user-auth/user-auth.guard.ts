@@ -9,11 +9,11 @@ import { JwtService } from '@nestjs/jwt';
 import JwtConfig from 'src/config/jwtconfig';
 import { Request } from 'express';
 import { configKeys } from 'src/config';
-import { AppCode, getUserIdentity } from 'src/helpers/indentifier';
 import { Reflector } from '@nestjs/core';
 import { AppAuthService } from 'src/app-auth/app-auth.service';
-import { USER_IDENTITY } from 'src/helpers/keys';
-import { Public } from 'src/public/public.reflectors';
+import { identifier, types, keys, callables } from 'src/helpers';
+import { reflectors } from 'src/public';
+
 @Injectable()
 export class UserAuthGuard implements CanActivate {
 	constructor(
@@ -24,21 +24,21 @@ export class UserAuthGuard implements CanActivate {
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const isPublic = this.reflector.getAllAndOverride<boolean>(Public, [
-			context.getHandler(),
-			context.getClass(),
-		]);
+		const isPublic = this.reflector.getAllAndOverride<boolean>(
+			reflectors.Public,
+			[context.getHandler(), context.getClass()],
+		);
 
 		if (isPublic) return true;
-
 		const request: Request = context.switchToHttp().getRequest();
-		const token = this.extractTokenFromHeader(request);
-		const appCodeValue = request.headers[AppCode];
-		const appCode: string = Array.isArray(appCodeValue)
-			? appCodeValue[0]
-			: appCodeValue;
 
+		if (!callables.checkAuthType(request, types.AuthType.Admin))
+			return true;
+
+		const token = this.extractTokenFromHeader(request);
 		if (!token) throw new UnauthorizedException('Token not found');
+
+		const appCode = request.headers[identifier.AppCode] as string;
 		if (!appCode)
 			throw new UnauthorizedException("Couldn't recognize the app");
 
@@ -56,12 +56,26 @@ export class UserAuthGuard implements CanActivate {
 				secret,
 			});
 
-			request[USER_IDENTITY] = getUserIdentity(request.headers, payload);
+			const userIdentity = identifier.getUserIdentity(
+				request.headers,
+				payload,
+			);
+
+			request[keys.USER_IDENTITY] = userIdentity;
 		} catch (error) {
 			throw new UnauthorizedException(
 				"Couldn't Authenticate: " + error.message,
 			);
 		}
+
+		const userIdentity = request[keys.USER_IDENTITY] as types.UserIdentity;
+		const userRole = this.reflector.getAllAndOverride(reflectors.Roles, [
+			context.getHandler(),
+			context.getClass(),
+		]) as types.UserRole[];
+
+		if (userRole && !userRole.includes(userIdentity.user.role))
+			throw new UnauthorizedException("Doesn't have access");
 
 		return true;
 	}

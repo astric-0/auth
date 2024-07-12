@@ -28,9 +28,13 @@ export default class CreateAppDto {
 
 	@Expose()
 	@IsOptional()
-	userExpireTime: string;
+	userTokenExpireTime: string;
+
+	@Expose()
+	@IsOptional()
+	appTokenExpireTime: string;
 
 	@Exclude()
 	@IsNotEmpty()
-	password: string;
+	appPassword: string;
 }

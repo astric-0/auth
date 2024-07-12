@@ -13,9 +13,9 @@ export default () => ({
 	},
 	jwt: {
 		appDefaultSecret: process.env.APP_DEFAULT_JWT_SECRET,
-		appDefaultexpiresIn: process.env.APP_DEFAULT_JWT_EXPIRE_TIME,
+		appDefaultExpiresIn: process.env.APP_DEFAULT_JWT_EXPIRE_TIME,
 		userDefaultSecret: process.env.USER_DEFAULT_JWT_SECRET,
-		userDefaultexpiresIn: process.env.USER_DEFAULT_JWT_EXPIRE_TIME,
+		userDefaultExpiresIn: process.env.USER_DEFAULT_JWT_EXPIRE_TIME,
 	},
 });
 

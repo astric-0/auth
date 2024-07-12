@@ -9,11 +9,13 @@ import { AppAuthService } from './app-auth.service';
 import { CreateAppDto, AppInfoDto } from './dto/';
 import { UserAuthGuard } from 'src/user-auth/user-auth.guard';
 import { guards, reflectors } from 'src/public/';
-import { UserRole } from 'src/helpers/types';
+import { UserRole, AuthType } from 'src/helpers/types';
+import { AppAuthGuard } from './app-auth.guard';
 
 @Controller('app-auth')
-@UseGuards(UserAuthGuard, guards.RolesGuard)
+@UseGuards(guards.AuthTypeGuard, UserAuthGuard, AppAuthGuard)
 @reflectors.Roles([UserRole.SuperAdmin])
+@reflectors.AllowedAuthType([AuthType.Admin, AuthType.App])
 export class AppAuthController {
 	constructor(private readonly appAuthService: AppAuthService) {}
 

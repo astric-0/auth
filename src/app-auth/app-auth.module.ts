@@ -18,7 +18,7 @@ import { JwtConfig, configKeys } from 'src/config';
 			useFactory: async (configService: ConfigService) => {
 				const {
 					userDefaultSecret: secret,
-					userDefaultexpiresIn: expiresIn,
+					userDefaultExpiresIn: expiresIn,
 				} = configService.get<JwtConfig>(configKeys.jwt);
 
 				return {
