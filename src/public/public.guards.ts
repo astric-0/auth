@@ -29,7 +29,7 @@ export class RolesGuard implements CanActivate {
 		const request: Request = context.switchToHttp().getRequest();
 		const userIdentity: types.UserIdentity = request[keys.USER_IDENTITY];
 		if (!userRole.includes(userIdentity.user.role))
-			throw new UnauthorizedException("Doesn't have access");
+			throw new UnauthorizedException('Access denied');
 		return true;
 	}
 }
