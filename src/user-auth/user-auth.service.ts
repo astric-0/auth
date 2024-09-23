@@ -70,7 +70,7 @@ export class UserAuthService {
 		});
 
 		const { userSecret: secret }: AppInfoDto =
-			await this.appAuthService.findOneByAppCodeOrAppName({
+			await this.appAuthService.findOneByAppCodeOrAppNameDto({
 				appCode,
 			});
 

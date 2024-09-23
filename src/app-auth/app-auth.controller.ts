@@ -6,7 +6,7 @@ import {
 	UseGuards,
 } from '@nestjs/common';
 import { AppAuthService } from './app-auth.service';
-import { CreateAppDto, AppInfoDto } from './dto/';
+import { CreateAppDto, AppInfoDto, LoginAppDto } from './dto/';
 import { UserAuthGuard } from 'src/user-auth/user-auth.guard';
 import { guards, reflectors } from 'src/public/';
 import { UserRole, AuthType } from 'src/helpers/types';
@@ -30,5 +30,11 @@ export class AppAuthController {
 		return appInfoDto;
 	}
 
-	//@Post('')
+	@Post('login')
+	login(@Body() { appCode, appPassword }: LoginAppDto) {
+		if (!appCode || !appPassword)
+			throw new BadRequestException('Provide all the fields');
+
+		return this.appAuthService.login(appCode, appPassword);
+	}
 }

@@ -29,7 +29,7 @@ export class AppAuthGuard implements CanActivate {
 			throw new UnauthorizedException("Couldn't recognize the app");
 
 		const { appSecret: secret } =
-			await this.appAuthService.findOneByAppCodeOrAppName({
+			await this.appAuthService.findSecretByAppCodeOrAppName({
 				appCode,
 			});
 
@@ -50,6 +50,6 @@ export class AppAuthGuard implements CanActivate {
 
 	private extractTokenFromHeader(req: Request): string {
 		const [type, token] = req.headers.authorization?.split(' ') ?? [];
-		return type == 'bearer' ? token : undefined;
+		return type == 'bearer' ? token : null;
 	}
 }

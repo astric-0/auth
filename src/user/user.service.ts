@@ -72,7 +72,7 @@ export class UserService {
 		appCode,
 	}: CreateUserDto): Promise<UserInfoDto> {
 		const appInfoDto: AppInfoDto =
-			await this.appAuthService.findOneByAppCodeOrAppName({
+			await this.appAuthService.findOneByAppCodeOrAppNameDto({
 				appCode,
 				appName: null,
 			});

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { App, AppDocument } from './app.schema';
 import { cns, converter } from 'src/helpers';
@@ -7,6 +7,8 @@ import { ConfigService } from '@nestjs/config';
 import { configKeys, JwtConfig } from 'src/config';
 import { CreateAppDto, AppInfoDto } from './dto/';
 import * as bcrypt from 'bcrypt';
+import { AppInfo } from './entity/';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AppAuthService {
@@ -21,6 +23,7 @@ export class AppAuthService {
 		@InjectModel(App.name, cns.MAIN)
 		private readonly appModel: Model<AppDocument>,
 		private readonly configService: ConfigService,
+		private readonly jwtService: JwtService,
 	) {
 		this.appDefaultSaltRounds = Number(
 			this.configService.get<number>(configKeys.appDefaultSaltRounds),
@@ -55,10 +58,10 @@ export class AppAuthService {
 		appTokenExpireTime = this.appDefaultExpiresIn,
 	}: CreateAppDto): Promise<AppInfoDto | null> {
 		const salt = await bcrypt.genSalt(saltRoundsForApp);
-		const appPasswordHashed = await bcrypt.hash(appPassword, salt);
+		const hashedAppPassword = await bcrypt.hash(appPassword, salt);
 
 		const appInfoDto: AppInfoDto | null =
-			await this.findOneByAppCodeOrAppName({ appName, appCode });
+			await this.findOneByAppCodeOrAppNameDto({ appName, appCode });
 
 		if (appInfoDto) return null;
 
@@ -71,21 +74,56 @@ export class AppAuthService {
 			userSecret,
 			userTokenExpireTime,
 			appTokenExpireTime,
-			appPasswordHashed,
+			hashedAppPassword,
 		});
 
 		const appObj = (await appDoc.save()).toObject();
 		return converter.toInstanceAndExcludeExtras(appObj, AppInfoDto);
 	}
 
-	async findOneByAppCodeOrAppName({
+	async findOneByAppCodeOrAppNameDto({
 		appName,
 		appCode,
 	}: {
-		appName?: string | null | undefined;
-		appCode?: string | null | undefined;
+		appName?: string;
+		appCode?: string;
 	}): Promise<AppInfoDto | null> {
-		if (!appName && !appCode) return null;
+		const appInfo = await this.findOneByAppCodeOrAppName({
+			appName,
+			appCode,
+		});
+
+		if (!appInfo) return null;
+		return converter.toInstanceAndExcludeExtras(appInfo, AppInfoDto);
+	}
+
+	public async findSecretByAppCodeOrAppName({
+		appName,
+		appCode,
+	}: {
+		appName?: string;
+		appCode?: string;
+	}): Promise<{ userSecret: string; appSecret: string } | null> {
+		const appInfo: AppInfo = await this.findOneByAppCodeOrAppName({
+			appName,
+			appCode,
+		});
+
+		if (!appInfo) return null;
+		
+		const { appSecret, userSecret } = appInfo;
+		return { appSecret, userSecret };
+	}
+
+	private async findOneByAppCodeOrAppName({
+		appName,
+		appCode,
+	}: {
+		appName?: string;
+		appCode?: string;
+	}): Promise<AppInfo | null> {
+		if (!appName && !appCode)
+			throw new BadRequestException('Invalid AppName or AppCode');
 
 		const conditions = [];
 		if (appCode)
@@ -94,17 +132,40 @@ export class AppAuthService {
 			});
 		if (appName)
 			conditions.push({
-				appName: { $regex: new RegExp(`${appName}`, 'i') },
+				appName: { $regex: new RegExp(`^${appName}`, 'i') },
 			});
 
 		const appInfoObj = await this.appModel
-			.findOne({
-				$or: conditions,
-			})
+			.findOne({ $or: conditions })
 			.lean()
 			.exec();
-
 		if (!appInfoObj) return null;
-		return converter.toInstanceAndExcludeExtras(appInfoObj, AppInfoDto);
+		return converter.toInstanceAndIncludeExtras(appInfoObj, AppInfo);
+	}
+
+	async login(
+		appCode: string,
+		appPassword: string,
+	): Promise<{ access_token: string }> {
+		const appInfo: AppInfo = await this.findOneByAppCodeOrAppName({
+			appCode,
+		});
+
+		if (
+			!appInfo ||
+			!(await bcrypt.compare(appPassword, appInfo.hashedAppPassword))
+		)
+			throw new BadRequestException('Incorrect AppCode or Password');
+
+		const appInfoDto = converter.toInstanceAndExcludeExtras(
+			appInfo,
+			AppInfoDto,
+		);
+
+		return {
+			access_token: await this.jwtService.signAsync(appInfoDto, {
+				secret: appInfo.appSecret,
+			}),
+		};
 	}
 }

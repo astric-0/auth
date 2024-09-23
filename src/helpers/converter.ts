@@ -17,3 +17,10 @@ export function toInstanceArrayAndExcludeExtras<T, V>(
 		excludeExtraneousValues: true,
 	});
 }
+
+export function toInstanceAndIncludeExtras<T, V>(
+	obj: V,
+	cls: ClassConstructor<T>,
+): T {
+	return plainToInstance(cls, obj);
+}

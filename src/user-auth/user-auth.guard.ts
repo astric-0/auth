@@ -47,7 +47,7 @@ export class UserAuthGuard implements CanActivate {
 		);
 
 		const { userSecret: secret = userDefaultSecret } =
-			await this.appAuthService.findOneByAppCodeOrAppName({
+			await this.appAuthService.findSecretByAppCodeOrAppName({
 				appCode,
 			});
 

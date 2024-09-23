@@ -15,7 +15,7 @@ export class App {
 	appSecret: string;
 
 	@Prop({ type: String, required: true })
-	appPasswordHashed: string;
+	hashedAppPassword: string;
 
 	@Prop({ type: Number })
 	saltRoundsForUsers: number;
