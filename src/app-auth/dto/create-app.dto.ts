@@ -16,23 +16,23 @@ export default class CreateAppDto {
 
 	@Expose()
 	@IsOptional()
-	saltRoundsForUsers: number;
+	saltRoundsForUsers?: number;
 
 	@Expose()
 	@IsOptional()
-	saltRoundsForApp: number;
+	saltRoundsForApp?: number;
+
+	@Exclude()
+	@IsOptional()
+	userSecret?: string;
 
 	@Expose()
 	@IsOptional()
-	userSecret: string;
+	userTokenExpireTime?: string;
 
 	@Expose()
 	@IsOptional()
-	userTokenExpireTime: string;
-
-	@Expose()
-	@IsOptional()
-	appTokenExpireTime: string;
+	appTokenExpireTime?: string;
 
 	@Exclude()
 	@IsNotEmpty()

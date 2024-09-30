@@ -13,6 +13,7 @@ export function toInstanceArrayAndExcludeExtras<T, V>(
 	obj: V[],
 	cls: ClassConstructor<T>,
 ): T[] {
+	if (!obj?.length) return [];
 	return plainToInstance(cls, obj, {
 		excludeExtraneousValues: true,
 	});

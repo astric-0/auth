@@ -1,14 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { App, AppDocument } from './app.schema';
-import { cns, converter } from 'src/helpers';
-import { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
-import { configKeys, JwtConfig } from 'src/config';
-import { CreateAppDto, AppInfoDto } from './dto/';
-import * as bcrypt from 'bcrypt';
-import { AppInfo } from './entity/';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+
+import { App, AppDocument } from './app.schema';
+import { configKeys, JwtConfig } from 'src/config';
+import { cns, converter } from 'src/helpers';
+
+import { CreateAppDto, AppInfoDto } from './dto/';
+import { AppInfo } from './entity/';
 
 @Injectable()
 export class AppAuthService {
@@ -110,7 +112,7 @@ export class AppAuthService {
 		});
 
 		if (!appInfo) return null;
-		
+
 		const { appSecret, userSecret } = appInfo;
 		return { appSecret, userSecret };
 	}

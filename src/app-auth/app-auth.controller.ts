@@ -19,6 +19,7 @@ import { AppAuthGuard } from './app-auth.guard';
 export class AppAuthController {
 	constructor(private readonly appAuthService: AppAuthService) {}
 
+	@reflectors.Public(true)
 	@Post('create-app')
 	async createApp(@Body() createAppDto: CreateAppDto) {
 		const appInfoDto: AppInfoDto =

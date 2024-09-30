@@ -3,15 +3,18 @@ import {
 	ConflictException,
 	Injectable,
 } from '@nestjs/common';
-import { UserDocument, User as UserModel } from './user.schema';
-import { InjectModel } from '@nestjs/mongoose';
-import { cns, converter } from 'src/helpers';
-import { Model } from 'mongoose';
-import { CreateUserDto, UserInfoDto } from './dto';
 import { ConfigService } from '@nestjs/config';
-import { configKeys } from 'src/config';
+import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
+
+import { configKeys } from 'src/config';
 import { AppAuthService } from 'src/app-auth/app-auth.service';
+import { cns, converter, callables } from 'src/helpers';
+import { Model } from 'mongoose';
+
+import { UserDocument, User as UserModel } from './user.schema';
+import { CreateUserDto, UserInfoDto, UserQueryDto } from './dto';
+import { PageQueryDto } from 'src/global-dtos';
 import { AppInfoDto } from 'src/app-auth/dto/';
 
 @Injectable()
@@ -46,13 +49,19 @@ export class UserService {
 		);
 	}
 
-	async findAll(appCode: string): Promise<UserInfoDto[] | null> {
+	async findAll(
+		appCode: string,
+		pageQueryDto: PageQueryDto,
+		userQueryDto: UserQueryDto,
+	): Promise<UserInfoDto[]> {
 		const userDocs: UserDocument[] | null = await this.userModel
-			.find({ appCode })
+			.find(
+				{ appCode, ...userQueryDto },
+				callables.getPagination(pageQueryDto),
+			)
 			.lean()
 			.exec();
 
-		if (userDocs?.length == 0) return null;
 		return converter.toInstanceArrayAndExcludeExtras(userDocs, UserInfoDto);
 	}
 

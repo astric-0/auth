@@ -10,19 +10,21 @@ import {
 	HttpStatus,
 	UseGuards,
 	Headers,
+	Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto, UserInfoDto } from './dto/';
+import { CreateUserDto, UserInfoDto, UserQueryDto } from './dto/';
 import { UserAuthGuard } from 'src/user-auth/user-auth.guard';
 import { reflectors, decorators } from 'src/public/';
 import { types, keys, identifier } from 'src/helpers/';
+import { PageQueryDto } from 'src/global-dtos';
 
 @UseGuards(UserAuthGuard)
 @Controller('user')
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
-	@Get('findOne/:id')
+	@Get(':id')
 	async findOne(
 		@Param('id') id: string,
 		@Headers(identifier.AppCode) appCode: string,
@@ -51,20 +53,26 @@ export class UserController {
 		return user;
 	}
 
-	@Get('findAll')
+	@Get()
 	async findAll(
 		@decorators.Identity({ type: keys.USER_IDENTITY })
 		userIdentity: types.UserIdentity,
+		@Query() userQueryDto: UserQueryDto,
+		@Query() pageQueryDto: PageQueryDto,
 	) {
-		const usersInfoDto: UserInfoDto[] | null =
-			await this.userService.findAll(userIdentity.appCode);
-		if (!usersInfoDto)
+		const usersInfoDto: UserInfoDto[] = await this.userService.findAll(
+			userIdentity.appCode,
+			pageQueryDto,
+			userQueryDto,
+		);
+
+		if (!usersInfoDto?.length)
 			throw new NotFoundException("Couldn't find users for the app");
 		return usersInfoDto;
 	}
 
 	@reflectors.Public(true)
-	@Post('create')
+	@Post()
 	@HttpCode(HttpStatus.CREATED)
 	async create(
 		@Body() user: CreateUserDto,
